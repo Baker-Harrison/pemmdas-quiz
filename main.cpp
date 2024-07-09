@@ -99,7 +99,7 @@ double pemmdasQuiz()
     for (int i = 0; i < numberOfProblems; i++)
     {
         cout
-            << "------------------------------------------------------" << endl
+            << "<------------------------------------------------------>" << endl
             << generateNumber(1, 20) << ' ' << operators[generateNumber(0, 4)] << ' '
             << generateNumber(1, 20) << ' ' << operators[generateNumber(0, 4)] << ' '
             << generateNumber(1, 20) << ' ' << operators[generateNumber(0, 4)] << ' '
@@ -109,7 +109,7 @@ double pemmdasQuiz()
             << generateNumber(1, 20) << ' ' << operators[generateNumber(0, 4)] << ' '
             << generateNumber(1, 20) << ' ' << operators[generateNumber(0, 4)] << ' '
             << generateNumber(1, 20) << endl
-            << "------------------------------------------------------" << endl;
+            << "<------------------------------------------------------>" << endl;
         cout << "Answer here: ";
         cin >> answer;
 
