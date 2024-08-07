@@ -2,14 +2,20 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <string>
+#include <cctype>
 using namespace std;
 
 double modulusQuiz();
 double pemmdasQuiz();
 void printScores(vector<double> modulus, vector<double> pemmdas);
 int generateNumber(int start, int end);
-vector<string> tokenize(string &expression);
-int evalulateStringAsMathExpression(vector<string> &tokens);
+double evaluateAddSub(string& expression, size_t& pos);
+double evaluateMulDivMod(string& expression, size_t& pos);
+double evaluateNumber(string& expression, size_t& pos);
+double evaluateExpression(string expression);
+
+
 
 int main()
 {
@@ -18,16 +24,8 @@ int main()
     vector<double> modulusScores;
     vector<double> pemmdasScores;
 
-	string part = "2+3+4+5+6+7+8+9";
-	vector<string> tokens = tokenize(part);
-
-	for (string part : tokens)
-	{
-		cout << part << endl;
-	}
 
 
-	return 0;
     do
     {
         cout << "Welcome to PEMMDAS practice.  " << endl
@@ -102,6 +100,7 @@ double pemmdasQuiz()
 {
 
     int numberOfProblems;
+    int numberOfProblemsCorrect = 0;
 
     double answer;
     const string operators[8] = {"*", "/", "+", "-", "%"};
@@ -113,24 +112,37 @@ double pemmdasQuiz()
 	string expression;
 	for (int i = 0; i < numberOfProblems; i++)
     {
-		expression = std::to_string(generateNumber(1, 9)) + operators[generateNumber(0, 4)] +
-	                         std::to_string(generateNumber(1, 9)) + operators[generateNumber(0, 4)] +
-	                         std::to_string(generateNumber(1, 9)) +   operators[generateNumber(0, 4)] +
-	                         std::to_string(generateNumber(1, 9)) + operators[generateNumber(0, 4)] +
-	                         std::to_string(generateNumber(1, 9)) +  operators[generateNumber(0, 4)] +
-	                         std::to_string(generateNumber(1, 9)) +   operators[generateNumber(0, 4)] +
-	                         std::to_string(generateNumber(1, 9)) +   operators[generateNumber(0, 4)] +
-	                         std::to_string(generateNumber(1, 9)) +    operators[generateNumber(0, 4)] +
+		expression = std::to_string(generateNumber(1, 9)) + " " + operators[generateNumber(0, 4)] + " " +
+	                         std::to_string(generateNumber(1, 9)) + " " + operators[generateNumber(0, 4)] + " " +
+	                         std::to_string(generateNumber(1, 9)) + " " +   operators[generateNumber(0, 4)] + " " +
+	                         std::to_string(generateNumber(1, 9)) + " " + operators[generateNumber(0, 4)] + " " +
+	                         std::to_string(generateNumber(1, 9)) + " "  + operators[generateNumber(0, 4)] + " " +
+	                         std::to_string(generateNumber(1, 9)) + " "   + operators[generateNumber(0, 4)] + " " +
+	                         std::to_string(generateNumber(1, 9)) + " "   + operators[generateNumber(0, 4)] + " " +
+	                         std::to_string(generateNumber(1, 9)) + " "    + operators[generateNumber(0, 4)] + " " +
 	                         std::to_string(generateNumber(1, 9));
 
         cout << expression << endl;
         cout << "Answer here: ";
         cin >> answer;
 
-        cout << "Your answer: " << answer << endl;
-    }
+        double correctAnswer = evaluateExpression(expression);
 
-    return 0;
+        // cout << "Correct Answer: " << correctAnswer << endl;
+        if (answer == correctAnswer)
+        {
+            cout << "Correct" << endl;
+            numberOfProblemsCorrect += 1;
+        }
+        else
+        {
+            cout << "Incorrect" << endl;
+        }
+    }
+    double percent = numberOfProblemsCorrect / static_cast<double>(numberOfProblems) * 100;
+    cout << "You scored " << numberOfProblemsCorrect << " out of " << numberOfProblems << endl
+         << "That's " << percent << "%." << endl;
+    return percent;
 }
 
 void printScores(vector<double> modulus, vector<double> pemmdas)
@@ -160,48 +172,61 @@ int generateNumber(int start, int end)
 
 
 
-vector<string> tokenize(string &expression)
+double evaluateAddSub(string& expression, size_t& pos)
 {
-
-	vector<string> tokens;
-	size_t parts = expression.size() / 3;
-
-	int pos = 0;
-	while ( pos < expression.size() - 2)
-	{
-		string token = "";
-
-		token += expression[pos];
-		pos++;
-		token += expression[pos];
-		pos++;
-		token += expression[pos];
-
-
-
-		tokens.push_back(token);
-
-
-	}
-	unsigned int counter = 0;
-
-
-	for (string &token : tokens)
-	{
-		if (counter % 2 != 0 && (counter + 1) <= tokens.size())
-		{
-			tokens.erase(tokens.begin()+counter);
-		}
-		counter++;
-	}
-
-	return tokens;
-
+    double result = evaluateMulDivMod(expression, pos);
+    while (pos < expression.length()) {
+        while (pos < expression.length() && isspace(expression[pos])) pos++; // Skip whitespace
+        if (pos >= expression.length()) break;
+        char op = expression[pos];
+        if (op != '+' && op != '-') break;
+        pos++;
+        while (pos < expression.length() && isspace(expression[pos])) pos++; // Skip whitespace
+        double right = evaluateMulDivMod(expression, pos);
+        if (op == '+') result += right;
+        if (op == '-') result -= right;
+    }
+    return result;
 }
-
-int evalulateStringAsMathExpression()
+double evaluateMulDivMod(string& expression, size_t& pos)
 {
-
+    double result = evaluateNumber(expression, pos);
+    while (pos < expression.length()) {
+        while (pos < expression.length() && isspace(expression[pos])) pos++; // Skip whitespace
+        if (pos >= expression.length()) break;
+        char op = expression[pos];
+        if (op != '*' && op != '/' && op != '%') break;
+        pos++;
+        while (pos < expression.length() && isspace(expression[pos])) pos++; // Skip whitespace
+        double right = evaluateNumber(expression, pos);
+        if (op == '*') result *= right;
+        if (op == '/') result = static_cast<int>(result) / static_cast<int>(right);
+        if (op == '%') result = static_cast<int>(result) % static_cast<int>(right);
+    }
+    return result;
 }
-
-
+double evaluateNumber(string& expression, size_t& pos)
+{
+    double result = 0;
+    while (pos < expression.length() && (isdigit(expression[pos]) || expression[pos] == '.')) {
+        if (expression[pos] == '.') {
+            pos++;
+            double decimal_place = 0.1;
+            while (pos < expression.length() && isdigit(expression[pos])) {
+                result += (expression[pos] - '0') * decimal_place;
+                decimal_place *= 0.1;
+                pos++;
+            }
+            break;
+        } else {
+            result = result * 10 + (expression[pos] - '0');
+            pos++;
+        }
+    }
+    return result;
+}
+double evaluateExpression(string expression)
+{
+    size_t pos = 0;
+    return evaluateAddSub(expression, pos);
+}
