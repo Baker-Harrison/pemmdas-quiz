@@ -1,0 +1,3 @@
+C:/Users/thehe/CLionProjects/CPP/pemmdas-quiz/cmake-build-debug/CMakeFiles/pemmdas_quiz.dir
+C:/Users/thehe/CLionProjects/CPP/pemmdas-quiz/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/thehe/CLionProjects/CPP/pemmdas-quiz/cmake-build-debug/CMakeFiles/rebuild_cache.dir
